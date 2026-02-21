@@ -1,0 +1,27 @@
+"""Reusable anti-automation checks for interaction telemetry."""
+
+
+def evaluate_interaction(interaction_data: dict, min_duration_ms: float, min_movement_events: int, require_direction_change: bool) -> dict:
+    issues = []
+
+    duration_ms = interaction_data.get("duration_ms", 0)
+    if duration_ms < min_duration_ms:
+        issues.append("مدة تفاعل قصيرة جداً")
+
+    movement_count = interaction_data.get("movement_count", 0)
+    if movement_count < min_movement_events:
+        issues.append("حركات قليلة")
+
+    direction_changes = interaction_data.get("direction_changes", 0)
+    if require_direction_change and direction_changes < 1:
+        issues.append("لم يتم تغيير اتجاه الدوران")
+
+    return {
+        "passed": len(issues) == 0,
+        "issues": issues,
+        "metrics": {
+            "duration_ms": duration_ms,
+            "movement_count": movement_count,
+            "direction_changes": direction_changes,
+        },
+    }
