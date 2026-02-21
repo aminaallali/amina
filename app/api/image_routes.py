@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import Blueprint, abort, send_file
 
 from app.models.image_pool import ImageAsset
@@ -10,4 +12,9 @@ def fetch_image(public_hash: str):
     asset = ImageAsset.query.filter_by(public_hash=public_hash, is_active=True).first()
     if not asset or not asset.file_path:
         abort(404)
-    return send_file(asset.file_path, mimetype="image/webp")
+
+    file_path = Path(asset.file_path)
+    if not file_path.exists():
+        abort(404)
+
+    return send_file(file_path, mimetype="image/webp")

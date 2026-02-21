@@ -112,7 +112,7 @@ class AuthService:
             return self._auth_success(user, challenge, ip_address)
         return self._auth_failure("محاذاة غير صحيحة", challenge=challenge, user=user, ip_address=ip_address)
 
-    def _verify_anti_automation(self, interaction_data: dict, challenge: AuthChallenge) -> dict:
+    def _verify_anti_automation(self, interaction_data: dict, _challenge: AuthChallenge) -> dict:
         return evaluate_interaction(
             interaction_data=interaction_data,
             min_duration_ms=self.config.MIN_INTERACTION_TIME * 1000,

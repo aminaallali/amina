@@ -5,6 +5,9 @@ from app.middleware.rate_limiter import rate_limit
 from app.services.auth_service import AuthService
 
 auth_api = Blueprint("auth_api", __name__, url_prefix="/api/v1")
+# Backward compatibility with older app factory imports (`from ... import api`)
+api = auth_api
+
 auth_service = AuthService(Config)
 
 

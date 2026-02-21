@@ -19,6 +19,9 @@ def create_app(config_class=None):
     db.init_app(app)
     CORS(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", "*")}})
 
+    # Backward/merge-friendly imports:
+    # - newer split blueprints
+    # - legacy single `api` blueprint name if present in older branches
     from app.api.auth_routes import auth_api
     from app.api.image_routes import image_api
     from app.api.registration_routes import registration_api
