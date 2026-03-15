@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .timer-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 60px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .timer-display {
+            font-size: 5rem;
+            font-weight: 200;
+            letter-spacing: 5px;
+            margin-bottom: 40px;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button:disabled:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .start {
+            background: rgba(72, 187, 120, 0.3);
+            border-color: rgba(72, 187, 120, 0.5);
+        }
+
+        .start:hover {
+            background: rgba(72, 187, 120, 0.5);
+        }
+
+        .pause {
+            background: rgba(245, 158, 11, 0.3);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .pause:hover {
+            background: rgba(245, 158, 11, 0.5);
+        }
+
+        .reset {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .reset:hover {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            .timer-container {
+                padding: 30px 40px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .timer-display {
+                font-size: 3.5rem;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+            }
+
+            button {
+                padding: 10px 25px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="timer-container">
+        <h1>TIMER</h1>
+        <div class="timer-display" id="display">00:00:00</div>
+        <div class="controls">
+            <button id="startBtn" class="start">START</button>
+            <button id="pauseBtn" class="pause" disabled>PAUSE</button>
+            <button id="resetBtn" class="reset">RESET</button>
+        </div>
+    </div>
+
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval = null;
+        let isRunning = false;
+
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function formatTime(milliseconds) {
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        function pad(number) {
+            return number.toString().padStart(2, '0');
+        }
+
+        function updateDisplay() {
+            display.textContent = formatTime(elapsedTime);
+        }
+
+        function start() {
+            if (!isRunning) {
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay();
+                }, 10);
+                isRunning = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+            }
+        }
+
+        function pause() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+            }
+        }
+
+        function reset() {
+            clearInterval(timerInterval);
+            elapsedTime = 0;
+            isRunning = false;
+            updateDisplay();
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        }
+
+        startBtn.addEventListener('click', start);
+        pauseBtn.addEventListener('click', pause);
+        resetBtn.addEventListener('click', reset);
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
